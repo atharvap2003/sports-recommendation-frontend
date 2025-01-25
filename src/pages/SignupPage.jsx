@@ -1,59 +1,52 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuth } from "../redux-store/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
-  // State for form inputs
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    mobile: "",
+  });
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Hook for navigation
 
-  // Handle form submission
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Basic validation
-    if (!email || !password || !mobile) {
-      setError("All fields are required.");
-      return;
-    }
-
-    // Start loading
-    setIsLoading(true);
-    setError("");
-
     try {
-      const response = await fetch("http://localhost:3000/api/route/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          mobile,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Registration successful, handle success (e.g., redirect or show success message)
-        console.log("User registered successfully:", data);
-        alert("Registration successful!");
-      } else {
-        // Handle error from backend
-        setError(data.message || "Registration failed.");
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/register",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (response.data.success) {
+        const { email, token, user_type } = response.data.data;
+        dispatch(setAuth({ email, token, user_type })); // Ensure these keys match response.data
+        navigate("/");
       }
     } catch (err) {
-      // Handle network or other errors
-      setError("Something went wrong. Please try again.");
-    } finally {
-      // Stop loading
-      setIsLoading(false);
+      console.error(err.response?.data || "Error occurred during registration");
     }
   };
+  
+
   return (
     <>
       <section className="bg-gray-50 dark:bg-gray-900">
@@ -63,7 +56,15 @@ const SignupPage = () => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center">
                 Register
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              {error && (
+                <div className="text-red-500 text-sm text-center">{error}</div>
+              )}
+              {successMessage && (
+                <div className="text-green-500 text-sm text-center">
+                  {successMessage}
+                </div>
+              )}
+              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="email"
@@ -77,7 +78,9 @@ const SignupPage = () => {
                     id="email"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="name@company.com"
-                    required=""
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
                 <div>
@@ -93,7 +96,9 @@ const SignupPage = () => {
                     id="password"
                     placeholder="••••••••"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required=""
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
                   />
                 </div>
                 <div>
@@ -109,54 +114,20 @@ const SignupPage = () => {
                     id="mobile"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="+91-XXXXXXXXXX"
-                    required=""
+                    required
                     inputMode="numeric"
-                    pattern="[0-9]{10}" // Allows exactly 10 digits
+                    pattern="[0-9]{10}"
                     title="Please enter a valid 10-digit mobile number"
+                    value={formData.mobile}
+                    onChange={handleChange}
                   />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="remember"
-                        aria-describedby="remember"
-                        type="checkbox"
-                        className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                        required=""
-                      />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label
-                        htmlFor="remember"
-                        className="text-gray-500 dark:text-gray-300"
-                      >
-                        Remember me
-                      </label>
-                    </div>
-                  </div>
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  >
-                    Forgot password?
-                  </a>
                 </div>
                 <button
                   type="submit"
                   className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
-                  Sign in
+                  Sign up
                 </button>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Have an account?{" "}
-                  <a
-                    href="/login"
-                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  >
-                    Login
-                  </a>
-                </p>
               </form>
             </div>
           </div>
