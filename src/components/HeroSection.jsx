@@ -1,5 +1,7 @@
 import React from "react";
 import { Play, Award, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const HeroSection = () => {
   const stats = [
@@ -8,16 +10,29 @@ const HeroSection = () => {
     { icon: Play, label: "Sports", value: "15+" },
   ];
 
+  const navigate = useNavigate();
+  
+  // Get token from Redux state
+  const token = useSelector((state) => state.auth.token);
+
+  const handleCreateAccountClick = () => {
+    if (token) {
+      // If token exists, show alert and prevent navigation
+      alert("You are logged in!");
+    } else {
+      // Otherwise, allow the navigation
+      navigate("/login");
+    }
+  };
+
   return (
     <>
       <div className="relative min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900">
-        {/* Animated background */}
+
         <div className="absolute inset-0 overflow-hidden">
-          {/* <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center opacity-20"></div> */}
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-950/80 to-purple-900/80 backdrop-blur-sm"></div>
         </div>
 
-        {/* Content */}
         <div className="relative min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-8 ">
           <div className="max-w-7xl mx-auto w-full pt-20 pb-16 text-center mt-12">
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
@@ -37,11 +52,12 @@ const HeroSection = () => {
                   Explore Events
                 </button>
               </a>
-              <a href="/login" rel="noopener noreferrer">
-                <button className="px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 backdrop-blur-sm transform hover:scale-105 transition-all duration-300">
-                  Create Account
-                </button>
-              </a>
+              <button
+                onClick={handleCreateAccountClick}
+                className="px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 backdrop-blur-sm transform hover:scale-105 transition-all duration-300"
+              >
+                Create Account
+              </button>
             </div>
 
             {/* Stats */}
