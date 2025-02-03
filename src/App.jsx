@@ -62,12 +62,12 @@ const AppContent = () => {
           }
         >
           <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="users/:id" element={<UserDetail />} />
-          <Route path="events" element={<AdminEvents />} />
-          <Route path="events/:id" element={<AdminEventDetail />} />
-          <Route path="equipment" element={<AdminEquipment />} />
-          <Route path="feedback" element={<Feedback />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/users/:id" element={<UserDetail />} />
+          <Route path="/admin/events" element={<AdminEvents />} />
+          <Route path="/admin/events/:id" element={<AdminEventDetail />} />
+          <Route path="/admin/equipment" element={<AdminEquipment />} />
+          <Route path="/admin/feedback" element={<Feedback />} />
         </Route>
       </Routes>
       {/* Only show Footer if not on login or register page */}

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Calendar, MapPin, Users, Clock, Trophy, Award, Target, 
   CheckCircle, AlertCircle, Info, Star, Shield, Clipboard,
-  Medal, DollarSign, User, Phone, Mail, Heart
+  Medal, DollarSign, User, Phone, Mail, Heart,IndianRupee
 } from 'lucide-react';
 import { events } from '../data/events';
 
@@ -298,8 +298,8 @@ const EventDetailPage = () => {
                 <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
                   <h3 className="font-semibold text-indigo-900 mb-2">Registration Fee</h3>
                   <div className="flex items-center text-indigo-600">
-                    <DollarSign className="h-5 w-5 mr-2" />
-                    <span className="text-2xl font-bold">₹500</span>
+                    <IndianRupee className="h-5 w-5 mr-2" />
+                    <span className="text-2xl font-bold">-</span>
                   </div>
                   <p className="text-sm text-indigo-900 mt-2">Includes event kit & refreshments</p>
                 </div>

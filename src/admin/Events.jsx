@@ -1,82 +1,99 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Events() {
-  const navigate = useNavigate()
-  const [showForm, setShowForm] = useState(false)
+  const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    startDate: '',
-    endDate: '',
-    location: '',
-    organizer: '',
-    contact: '',
-    description: '',
-    rules: '',
-    prizes: '',
-    sportsCategory: ''
-  })
-  
+    title: "",
+    startDate: "",
+    endDate: "",
+    location: "",
+    organizer: "",
+    contact: "",
+    description: "",
+    rules: "",
+    prizes: "",
+    sportsCategory: "",
+  });
+
   // Mock data
   const events = [
     {
       id: 1,
-      title: 'Inter-College Basketball Tournament',
-      date: '2024-04-15',
-      location: 'Main Sports Complex',
+      title: "Inter-College Basketball Tournament",
+      date: "2024-04-15",
+      location: "Main Sports Complex",
       participants: [
-        { name: 'John Doe', mobile: '+1 234-567-8900', email: 'john@example.com' },
-        { name: 'Jane Smith', mobile: '+1 234-567-8901', email: 'jane@example.com' },
-      ]
+        {
+          name: "John Doe",
+          mobile: "+1 234-567-8900",
+          email: "john@example.com",
+        },
+        {
+          name: "Jane Smith",
+          mobile: "+1 234-567-8901",
+          email: "jane@example.com",
+        },
+      ],
     },
     {
       id: 2,
-      title: 'Annual Sports Day',
-      date: '2024-05-01',
-      location: 'College Ground',
+      title: "Annual Sports Day",
+      date: "2024-05-01",
+      location: "College Ground",
       participants: [
-        { name: 'Mike Johnson', mobile: '+1 234-567-8902', email: 'mike@example.com' },
-        { name: 'Sarah Wilson', mobile: '+1 234-567-8903', email: 'sarah@example.com' },
-      ]
-    }
-  ]
+        {
+          name: "Mike Johnson",
+          mobile: "+1 234-567-8902",
+          email: "mike@example.com",
+        },
+        {
+          name: "Sarah Wilson",
+          mobile: "+1 234-567-8903",
+          email: "sarah@example.com",
+        },
+      ],
+    },
+  ];
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     // Here you would typically send the data to your backend
-    console.log('Form submitted:', formData)
-    setShowForm(false)
+    console.log("Form submitted:", formData);
+    setShowForm(false);
     setFormData({
-      title: '',
-      startDate: '',
-      endDate: '',
-      location: '',
-      organizer: '',
-      contact: '',
-      description: '',
-      rules: '',
-      prizes: '',
-      sportsCategory: ''
-    })
-  }
+      title: "",
+      startDate: "",
+      endDate: "",
+      location: "",
+      organizer: "",
+      contact: "",
+      description: "",
+      rules: "",
+      prizes: "",
+      sportsCategory: "",
+    });
+  };
+
+  const handleEventClick = (eventId) => {
+    navigate(`/admin/events/${eventId}`);
+  };
 
   return (
     <div className="content-area">
       <h1 className="page-title">Events Management</h1>
-      
+
       <div className="mb-6">
-        <button 
-          className="btn-primary"
-          onClick={() => setShowForm(true)}
-        >
+        <button className="btn-primary" onClick={() => setShowForm(true)}>
           Create New Event
         </button>
       </div>
@@ -84,10 +101,14 @@ function Events() {
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Create New Event</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+              Create New Event
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Title
+                </label>
                 <input
                   type="text"
                   name="title"
@@ -97,10 +118,12 @@ function Events() {
                   required
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Start Date
+                  </label>
                   <input
                     type="date"
                     name="startDate"
@@ -111,7 +134,9 @@ function Events() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    End Date
+                  </label>
                   <input
                     type="date"
                     name="endDate"
@@ -124,7 +149,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Location
+                </label>
                 <input
                   type="text"
                   name="location"
@@ -136,7 +163,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sports Category</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Sports Category
+                </label>
                 <select
                   name="sportsCategory"
                   value={formData.sportsCategory}
@@ -154,7 +183,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Organizer</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Organizer
+                </label>
                 <input
                   type="text"
                   name="organizer"
@@ -166,7 +197,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Contact</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Contact
+                </label>
                 <input
                   type="text"
                   name="contact"
@@ -178,7 +211,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Description
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -190,7 +225,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Rules</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Rules
+                </label>
                 <textarea
                   name="rules"
                   value={formData.rules}
@@ -203,7 +240,9 @@ function Events() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Prizes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Prizes
+                </label>
                 <textarea
                   name="prizes"
                   value={formData.prizes}
@@ -223,10 +262,7 @@ function Events() {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                >
+                <button type="submit" className="btn-primary">
                   Create Event
                 </button>
               </div>
@@ -236,11 +272,11 @@ function Events() {
       )}
 
       <div className="grid gap-6">
-        {events.map(event => (
+        {events.map((event) => (
           <div
             key={event.id}
             className="card hover:shadow-lg cursor-pointer transition-shadow"
-            onClick={() => navigate(`/events/${event.id}`)}
+            onClick={() => handleEventClick(event.id)} // Using the function
           >
             <div className="flex justify-between items-start">
               <div>
@@ -249,13 +285,16 @@ function Events() {
                 </h3>
                 <div className="space-y-2">
                   <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Date:</span> {new Date(event.date).toLocaleDateString()}
+                    <span className="font-medium">Date:</span>{" "}
+                    {new Date(event.date).toLocaleDateString()}
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Location:</span> {event.location}
+                    <span className="font-medium">Location:</span>{" "}
+                    {event.location}
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Participants:</span> {event.participants.length}
+                    <span className="font-medium">Participants:</span>{" "}
+                    {event.participants.length}
                   </p>
                 </div>
               </div>
@@ -265,7 +304,7 @@ function Events() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default Events
+export default Events;
