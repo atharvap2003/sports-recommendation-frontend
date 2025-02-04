@@ -1,32 +1,30 @@
 import React, { useState } from "react";
 import { User, Camera, FileText, Info } from "lucide-react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { storage } from "../firebaseConfig"; // Import firebase storage config
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import axios from "axios"; // Import axios for making HTTP requests
+import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
+import { useCookies } from "react-cookie"; // Import the cookies library to retrieve token from cookie
 
 const ProfileCreationPage = () => {
   const navigate = useNavigate();
-  const userid = useSelector((state) => state.auth.id);
-  const token = useSelector((state) => state.auth.token);
-  console.log(userid, token);
+  const [cookies] = useCookies(["token"]); // Get token from cookie
+  const token = cookies.token;
+
+  const userId = useSelector((state) => state.auth.id); // Access userId from Redux store
 
   // State to hold files, upload status, and downloadable URLs
   const [profilePic, setProfilePic] = useState(null);
   const [feeReceipt, setFeeReceipt] = useState(null);
-  const [idProof, setIdProof] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [downloadUrls, setDownloadUrls] = useState({
     profilePicUrl: null,
     feeReceiptUrl: null,
-    idProofUrl: null,
   });
 
   const [formData, setFormData] = useState({
     department: "",
     currentYear: "",
-    prnNumber: "",
     age: "",
     description: "",
     address: "",
@@ -47,10 +45,10 @@ const ProfileCreationPage = () => {
     const file = e.target.files[0];
     if (type === "profilePic") {
       setProfilePic(file); // Store file directly for upload
+      handleUpload(file, "profilePic");
     } else if (type === "feeReceipt") {
       setFeeReceipt(file);
-    } else if (type === "idProof") {
-      setIdProof(file);
+      handleUpload(file, "feeReceipt");
     }
   };
 
@@ -58,7 +56,7 @@ const ProfileCreationPage = () => {
     if (!file) return;
 
     setUploading(true);
-    const storageRef = ref(storage, `users/${userid}/${type}/${file.name}`);
+    const storageRef = ref(storage, `users/${userId}/${type}/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -87,56 +85,44 @@ const ProfileCreationPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Upload files first
-    if (feeReceipt) await handleUpload(feeReceipt, "feeReceipt");
-    if (idProof) await handleUpload(idProof, "idProof");
-    if (profilePic) await handleUpload(profilePic, "profilePic");
-
-    // Check if all uploads are completed successfully
-    if (
-      !downloadUrls.profilePicUrl ||
-      !downloadUrls.feeReceiptUrl ||
-      !downloadUrls.idProofUrl
-    ) {
-      alert("Some files failed to upload. Cancelling profile submission.");
-      return;
-    }
-
     // Wait for 5 seconds before submitting the data
     setTimeout(async () => {
       try {
         const dataToPost = {
-          userId: userid,
-          ...formData,
-          profile_image: downloadUrls.profilePicUrl,
-          fee_receipt: downloadUrls.feeReceiptUrl,
-          id_proof: downloadUrls.idProofUrl,
+          userId: userId,
+          profile_picture: downloadUrls.profilePicUrl,
+          collegeid: downloadUrls.feeReceiptUrl, // collegeid refers to feeReceipt URL
+          department: formData.department,
+          year: formData.currentYear,
+          age: formData.age,
+          description: formData.description,
+          address: formData.address,
         };
 
         console.log(dataToPost);
 
-        const response = await axios.post(
-          "http://localhost:3000/api/auth/create-profile",
-          dataToPost,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`, // Pass the token here
-            },
-          }
-        );
+        const response = await fetch("http://localhost:5000/api/auth/create-profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Pass the token here
+          },
+          body: JSON.stringify(dataToPost),
+        });
+
+        const result = await response.json();
 
         if (response.status === 200) {
           alert("Profile created successfully!");
           navigate("/"); // Redirect to profile or wherever necessary
         } else {
-          alert("Error creating profile");
+          alert(result.message || "Error creating profile");
         }
       } catch (error) {
         console.error("Error submitting profile:", error);
         alert("Error creating profile, try again later.");
       }
-    }, 8000); // Wait for 5 seconds
+    }, 5000); // Wait for 5 seconds
   };
 
   const handleInputChange = (e) => {
@@ -225,15 +211,6 @@ const ProfileCreationPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-gray-700 mb-2">PRN Number</label>
-                <input
-                  type="text"
-                  name="prnNumber"
-                  className="w-full p-3 border rounded-lg"
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
                 <label className="block text-gray-700 mb-2">Age</label>
                 <input
                   type="number"
@@ -257,6 +234,8 @@ const ProfileCreationPage = () => {
                 <textarea
                   className="w-full p-3 border rounded-lg"
                   rows={3}
+                  minLength={10}
+                  maxLength={300}
                   name="description"
                   onChange={handleInputChange}
                 ></textarea>
@@ -266,6 +245,8 @@ const ProfileCreationPage = () => {
                 <textarea
                   className="w-full p-3 border rounded-lg"
                   rows={3}
+                  minLength={10}
+                  maxLength={300}
                   name="address"
                   onChange={handleInputChange}
                 ></textarea>
@@ -299,26 +280,6 @@ const ProfileCreationPage = () => {
                   <div className="mt-2 text-green-500">
                     Fee Receipt Uploaded
                   </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  ID Proof
-                </label>
-                <label>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => handleFileChange(e, "idProof")}
-                  />
-                  <div className="w-full p-3 border rounded-lg cursor-pointer">
-                    Upload ID Proof
-                  </div>
-                </label>
-                {idProof && (
-                  <div className="mt-2 text-green-500">ID Proof Uploaded</div>
                 )}
               </div>
             </div>

@@ -1,10 +1,21 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Trophy, Calendar, UserCircle, Dumbbell, Medal } from 'lucide-react';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Trophy,
+  Calendar,
+  UserCircle,
+  Dumbbell,
+  Medal,
+} from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const location = useLocation();
+
+  const userType = useSelector((state) => state.auth.user_type);
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -18,13 +29,15 @@ const Navbar = () => {
             <Trophy className="h-8 w-8 text-indigo-300" />
             <span className="ml-2 text-xl font-bold">College Sports Hub</span>
           </Link>
-          
+
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               <Link
                 to="/"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                  isActive("/")
+                    ? "bg-indigo-800 text-white"
+                    : "hover:bg-indigo-800"
                 }`}
               >
                 Home
@@ -32,7 +45,9 @@ const Navbar = () => {
               <Link
                 to="/events"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/events') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                  isActive("/events")
+                    ? "bg-indigo-800 text-white"
+                    : "hover:bg-indigo-800"
                 }`}
               >
                 Events
@@ -40,7 +55,9 @@ const Navbar = () => {
               <Link
                 to="/equipment-list"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/equipment') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                  isActive("/equipment")
+                    ? "bg-indigo-800 text-white"
+                    : "hover:bg-indigo-800"
                 }`}
               >
                 Equipment
@@ -48,18 +65,22 @@ const Navbar = () => {
               <Link
                 to="/achievements"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/achievements') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                  isActive("/achievements")
+                    ? "bg-indigo-800 text-white"
+                    : "hover:bg-indigo-800"
                 }`}
               >
                 Achievements
               </Link>
               <Link
-                to="/profile-page"
+                to={userType === "student" ? "/profile-page" : "/admin"}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/profile') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                  isActive(userType === "Profile" ? "/profile-page" : "/admin")
+                    ? "bg-indigo-800 text-white"
+                    : "hover:bg-indigo-800"
                 }`}
               >
-                Profile
+                {userType === "student" ? "Profile" : "Admin-Dashboard"}
               </Link>
             </div>
           </div>
@@ -69,7 +90,11 @@ const Navbar = () => {
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md hover:bg-indigo-800"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -81,7 +106,9 @@ const Navbar = () => {
             <Link
               to="/"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                isActive("/")
+                  ? "bg-indigo-800 text-white"
+                  : "hover:bg-indigo-800"
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -90,7 +117,9 @@ const Navbar = () => {
             <Link
               to="/events"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/events') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                isActive("/events")
+                  ? "bg-indigo-800 text-white"
+                  : "hover:bg-indigo-800"
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -99,7 +128,9 @@ const Navbar = () => {
             <Link
               to="/equipment-list"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/equipment') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                isActive("/equipment")
+                  ? "bg-indigo-800 text-white"
+                  : "hover:bg-indigo-800"
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -108,7 +139,9 @@ const Navbar = () => {
             <Link
               to="/achievements"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/achievements') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                isActive("/achievements")
+                  ? "bg-indigo-800 text-white"
+                  : "hover:bg-indigo-800"
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -117,7 +150,9 @@ const Navbar = () => {
             <Link
               to="/profile-page"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/profile') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800'
+                isActive("/profile")
+                  ? "bg-indigo-800 text-white"
+                  : "hover:bg-indigo-800"
               }`}
               onClick={() => setIsOpen(false)}
             >
