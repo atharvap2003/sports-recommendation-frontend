@@ -1,17 +1,21 @@
 import React, { useState } from "react";
-import { Star, Send, X } from "lucide-react";
+import { Star, Send } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const FeedbackForm = ({ isOpen, onClose }) => {
+const FeedbackForm = () => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    category: "",
-    feedback: "",
-    improvements: "",
+    reason: "",
+    description: "",
   });
-
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const token = useSelector((state) => state.auth.token);
   const categories = [
     "Sports Facilities",
     "Equipment Quality",
@@ -21,34 +25,61 @@ const FeedbackForm = ({ isOpen, onClose }) => {
     "Other",
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log({ ...formData, rating });
-    onClose();
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      category: "",
-      feedback: "",
-      improvements: "",
-    });
-    setRating(0);
+    setError("");
+    setSuccess("");
+    setIsSubmitting(true);
+
+    if (rating === 0) {
+      setError("Please select a rating before submitting.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const feedbackData = {
+      token,
+      rating,
+      reason: formData.reason,
+      description: formData.description,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/feedback/submit",
+        feedbackData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Handle success response
+      setFormData({ reason: "", description: "" });
+      setRating(0);
+      setSuccess(response.data.message || "Feedback submitted successfully!");
+      console.log("Server response:", response.data.feedback);
+      navigate("/")
+    } catch (err) {
+      console.error("Full error context:", {
+        error: err.response?.data?.message || err.message,
+        stack: err.stack,
+      });
+
+      setError(
+        err.response?.data?.message ||
+          "An error occurred while submitting feedback."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
-        >
-          <X className="h-6 w-6" />
-        </button>
-
+    <div className="flex items-center justify-center p-8 min-h-screen">
+      <div className="bg-white shadow-xl rounded-xl p-8 my-16 max-w-2xl w-full">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">
             Your Feedback Matters
@@ -57,6 +88,17 @@ const FeedbackForm = ({ isOpen, onClose }) => {
             Help us improve our sports facilities and services
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            {success}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Rating */}
@@ -86,47 +128,15 @@ const FeedbackForm = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Personal Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Name
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                required
-              />
-            </div>
-          </div>
-
           {/* Category */}
           <div>
             <label className="block text-gray-700 font-medium mb-2">
               Category
             </label>
             <select
-              value={formData.category}
+              value={formData.reason}
               onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
+                setFormData({ ...formData, reason: e.target.value })
               }
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               required
@@ -143,49 +153,30 @@ const FeedbackForm = ({ isOpen, onClose }) => {
           {/* Feedback */}
           <div>
             <label className="block text-gray-700 font-medium mb-2">
-              What did you like about our services?
+              What did you like about our services? or What can we improve?
             </label>
             <textarea
-              value={formData.feedback}
+              value={formData.description}
               onChange={(e) =>
-                setFormData({ ...formData, feedback: e.target.value })
+                setFormData({ ...formData, description: e.target.value })
               }
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               rows={4}
               required
-            />
-          </div>
-
-          {/* Improvements */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              What can we improve?
-            </label>
-            <textarea
-              value={formData.improvements}
-              onChange={(e) =>
-                setFormData({ ...formData, improvements: e.target.value })
-              }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              rows={4}
+              minLength={10}
+              maxLength={400}
             />
           </div>
 
           {/* Submit Button */}
           <div className="flex justify-end gap-4">
             <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
-            >
-              Cancel
-            </button>
-            <button
               type="submit"
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold flex items-center gap-2"
+              disabled={isSubmitting}
+              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="h-5 w-5" />
-              Submit Feedback
+              {isSubmitting ? "Submitting..." : "Submit Feedback"}
             </button>
           </div>
         </form>

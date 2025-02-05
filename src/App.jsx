@@ -10,8 +10,8 @@ import EventDetailPage from "./pages/EventDetailPage";
 import AchievementPage from "./pages/AchievementsPage";
 import ProfileCreationPage from "./pages/ProfileCreationPage";
 import AdminHome from "./admin/AdminHomePage";
+import FeedbackForm from "./pages/FeedbackForm";
 
-// import FeedbackForm from "./pages/FeedbackForm";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -23,8 +23,8 @@ import Users from "./admin/Users";
 import UserDetail from "./admin/UserDetail";
 import AdminEvents from "./admin/Events";
 import AdminEventDetail from "./admin/EventDetail";
-import AdminEquipment from "./admin/Equipment";
 import Feedback from "./admin/Feedback";
+import AdminEquipment from "./admin/Equipment";
 
 const AppContent = () => {
   const location = useLocation();
@@ -50,7 +50,7 @@ const AppContent = () => {
         <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/equipment-list" element={<EquipmentPage />} />
         <Route path="/achievements" element={<AchievementPage />} />
-        <Route path="/admin-dashboard" element={<Dashboard />} />
+        <Route path="/user/feedback" element={<FeedbackForm />} />
 
         {/* Admin Routes (Protected) */}
         <Route

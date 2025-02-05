@@ -11,13 +11,12 @@ const LoginPage = () => {
   });
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   // Get token from Redux state
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
-    // If token exists, navigate to the homepage
     if (token) {
       navigate("/"); // Redirect to homepage if already logged in
     }
@@ -33,28 +32,38 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Reset error state before login attempt
+
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        "http://localhost:5000/api/auth/login",
         formData,
         {
           headers: {
             "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
+      
 
-      if (response.data.success) {
-        const { email, user_type } = response.data.data;
-        const { token } = response.data;
+      const { user, token } = response.data;
 
-        dispatch(setAuth({ email, token, user_type })); // Dispatch login data to Redux
-        navigate("/"); // Redirect to homepage after successful login
-        alert("You are logged in! RTK Updated!");
+      dispatch(setAuth({ 
+        id: user.id, 
+        email: user.email, 
+        user_type: user.user_type, 
+        token 
+      }));
+      // Redirect based on user type
+      if (user.user_type === "Admin") {
+        navigate("/admin");
+      } else {
+        navigate("/profile-page");
       }
     } catch (err) {
       setError(err.response?.data.message || "Error occurred during login");
-      console.error(err);
+      console.error("Login error:", err);
     }
   };
 

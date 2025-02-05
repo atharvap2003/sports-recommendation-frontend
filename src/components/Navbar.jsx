@@ -63,7 +63,7 @@ const Navbar = () => {
                 Equipment
               </Link>
               <Link
-                to="/achievements"
+                to="/user/feedback"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive("/achievements")
                     ? "bg-indigo-800 text-white"
@@ -73,14 +73,14 @@ const Navbar = () => {
                 Achievements
               </Link>
               <Link
-                to={userType === "student" ? "/profile-page" : "/admin"}
+                to={userType === "admin" ? "/admin" : "/profile-page"}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(userType === "Profile" ? "/profile-page" : "/admin")
+                  isActive(userType === "admin" ? "/admin" : "/profile-page")
                     ? "bg-indigo-800 text-white"
                     : "hover:bg-indigo-800"
                 }`}
               >
-                {userType === "student" ? "Profile" : "Admin-Dashboard"}
+                {userType === "admin" ? "Admin-Dashboard" : "Profile"}
               </Link>
             </div>
           </div>
