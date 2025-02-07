@@ -75,7 +75,7 @@ function Feedback() {
       <h1 className="page-title">Student Feedback</h1>
 
       {/* Filters */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 p-1">
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}

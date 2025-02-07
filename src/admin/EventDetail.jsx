@@ -1,60 +1,83 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
 function EventDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Mock data
-  const event = {
-    id: parseInt(id),
-    title: "Inter-College Basketball Tournament",
-    startDate: "2024-04-15",
-    endDate: "2024-04-17",
-    location: "Main Sports Complex",
-    description:
-      "Annual inter-college basketball tournament featuring teams from neighboring colleges.",
-    organizer: "Sports Department",
-    contact: "sports@college.edu",
-    sportsCategory: "Basketball",
-    rules: [
-      "Teams must have 5-12 players",
-      "All players must be current students",
-      "Games will be 4 quarters of 10 minutes each",
-      "Standard NBA rules apply",
-    ],
-    prizes: [
-      "1st Place: $1000 + Trophy",
-      "2nd Place: $500",
-      "3rd Place: $250",
-      "Best Player: Special Award",
-    ],
-    participants: [
-      {
-        name: "John Doe",
-        mobile: "+1 234-567-8900",
-        email: "john@example.com",
-      },
-      {
-        name: "Jane Smith",
-        mobile: "+1 234-567-8901",
-        email: "jane@example.com",
-      },
-      {
-        name: "Mike Johnson",
-        mobile: "+1 234-567-8902",
-        email: "mike@example.com",
-      },
-      {
-        name: "Sarah Wilson",
-        mobile: "+1 234-567-8903",
-        email: "sarah@example.com",
-      },
-    ],
-  };
+  // Fetch event details from backend
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/admin/events/${id}`,
+          {
+            credentials: "include", // Include cookies for authentication
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch event details");
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setEvent(data.event);
+        } else {
+          throw new Error(data.message || "Event not found");
+        }
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
   const handleNavigateToEvents = () => {
     navigate("/admin/events");
   };
+
+  if (loading) {
+    return <div className="content-area">Loading event details...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="content-area">
+        <p className="text-red-500">{error}</p>
+        <button
+          onClick={handleNavigateToEvents}
+          className="mt-4 flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+        >
+          <FaArrowLeft className="mr-2" />
+          Back to Events
+        </button>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="content-area">
+        <p>Event not found.</p>
+        <button
+          onClick={handleNavigateToEvents}
+          className="mt-4 flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+        >
+          <FaArrowLeft className="mr-2" />
+          Back to Events
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="content-area">
       <button
@@ -140,7 +163,7 @@ function EventDetail() {
                 Rules
               </h2>
               <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                {event.rules.map((rule, index) => (
+                {event.rules.split("\n").map((rule, index) => (
                   <li key={index}>{rule}</li>
                 ))}
               </ul>
@@ -149,7 +172,7 @@ function EventDetail() {
                 Prizes
               </h2>
               <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                {event.prizes.map((prize, index) => (
+                {event.prizes.split("\n").map((prize, index) => (
                   <li key={index}>{prize}</li>
                 ))}
               </ul>
@@ -180,10 +203,10 @@ function EventDetail() {
                 {event.participants.map((participant, index) => (
                   <tr key={index}>
                     <td className="px-4 py-2 text-gray-800 dark:text-gray-300">
-                      {participant.name}
+                      {participant.fullname}
                     </td>
                     <td className="px-4 py-2 text-gray-800 dark:text-gray-300">
-                      {participant.mobile}
+                      {participant.mobile_number}
                     </td>
                     <td className="px-4 py-2 text-gray-800 dark:text-gray-300">
                       {participant.email}

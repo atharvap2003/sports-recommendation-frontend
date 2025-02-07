@@ -2,17 +2,16 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyC3AmLQYuRKSTGkOwWc1gNIcZ036NzF48E",
-    authDomain: "math-react-site-6b395.firebaseapp.com",
-    projectId: "math-react-site-6b395",
-    storageBucket: "math-react-site-6b395.appspot.com",
-    messagingSenderId: "413900846768",
-    appId: "1:413900846768:web:ad202ed7744cc16f366d75",
-    measurementId: "G-4483N6ZJ1D"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
