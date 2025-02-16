@@ -1,30 +1,61 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Calendar, MapPin, Users, Clock, Trophy, Award, Target, 
-  CheckCircle, AlertCircle, Info, Star, Shield, Clipboard,
-  Medal, DollarSign, User, Phone, Mail, Heart,IndianRupee
-} from 'lucide-react';
-import { events } from '../data/events';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  Trophy,
+  Award,
+  Target,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  Star,
+  Shield,
+  Clipboard,
+  Medal,
+  DollarSign,
+  User,
+  Phone,
+  Mail,
+  Heart,
+  IndianRupee,
+} from "lucide-react";
+import { events } from "../data/events";
 
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const event = events.find(e => e.id === parseInt(id));
+  // const event = events.find((e) => e.id === parseInt(id));
+  let date;
+  const [event, setEventDetails] = useState();
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/user/getevent/${id}`);
+        const data = await response.json();
+        if (data.success) {
+          setEventDetails(data.event)
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchEventDetails();
+  },[id]);
   
   const [formData, setFormData] = useState({
-    studentId: '',
-    name: '',
-    email: '',
-    phone: '',
-    category: '',
-    experience: '',
-    emergencyContact: '',
-    medicalConditions: '',
+    studentId: "",
+    name: "",
+    email: "",
+    phone: "",
+    category: "",
+    experience: "",
+    emergencyContact: "",
+    medicalConditions: "",
     termsAccepted: false,
     rulesAccepted: false,
-    liabilityAccepted: false,
-    medicalAccepted: false
   });
 
   const [showForm, setShowForm] = useState(false);
@@ -33,9 +64,11 @@ const EventDetailPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Event not found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Event not found
+          </h2>
           <button
-            onClick={() => navigate('/events')}
+            onClick={() => navigate("/events")}
             className="text-indigo-600 hover:text-indigo-800"
           >
             Back to Events
@@ -47,17 +80,17 @@ const EventDetailPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Registration submitted:', formData);
+    console.log("Registration submitted:", formData);
     setShowForm(false);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <div className="relative h-[500px] rounded-xl overflow-hidden mb-8">
-          <img 
-            src={event.image} 
+
+        <div className="relative h-[300px] rounded-xl overflow-hidden mb-8">
+          <img
+            src="https://tiemdelhi.com/blogs/wp-content/uploads/2023/03/sports-1024x683.jpg"
             alt={event.title}
             className="w-full h-full object-cover"
           />
@@ -65,28 +98,25 @@ const EventDetailPage = () => {
           <div className="absolute bottom-0 left-0 right-0 p-12">
             <div className="max-w-3xl">
               <div className="mb-4">
-                <span className="inline-block px-4 py-2 rounded-full bg-indigo-600 text-white text-sm font-semibold mb-4">
-                  {event.category}
-                </span>
-                <h1 className="text-5xl font-bold text-white mb-4">{event.title}</h1>
-                <p className="text-xl text-gray-200 mb-6">{event.description}</p>
+                <h1 className="text-5xl font-bold text-white mb-4">
+                  {event.title}
+                </h1>
+                <p className="text-xl text-gray-200 mb-6">
+                  {event.description}
+                </p>
               </div>
               <div className="flex flex-wrap gap-6 text-white">
                 <span className="flex items-center">
                   <Calendar className="h-5 w-5 mr-2" />
-                  {event.date}
+                  {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
                 </span>
                 <span className="flex items-center">
                   <MapPin className="h-5 w-5 mr-2" />
                   {event.location}
                 </span>
                 <span className="flex items-center">
-                  <Users className="h-5 w-5 mr-2" />
-                  {event.participants}
-                </span>
-                <span className="flex items-center">
                   <Clock className="h-5 w-5 mr-2" />
-                  Registration Deadline: {event.registrationDeadline}
+                  Registration Deadline: {new Date(event.applyLastDate).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -104,31 +134,21 @@ const EventDetailPage = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-center p-4 bg-indigo-50 rounded-lg">
-                  <Trophy className="h-8 w-8 text-indigo-600 mr-4" />
-                  <div>
-                    <h3 className="font-semibold">Cash Prizes</h3>
-                    <p className="text-sm text-gray-600">Worth ₹50,000</p>
-                  </div>
-                </div>
-                <div className="flex items-center p-4 bg-indigo-50 rounded-lg">
                   <Medal className="h-8 w-8 text-indigo-600 mr-4" />
                   <div>
                     <h3 className="font-semibold">Medals & Trophies</h3>
-                    <p className="text-sm text-gray-600">For winners & runners-up</p>
+                    <p className="text-sm text-gray-600">
+                      For winners & runners-up
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center p-4 bg-indigo-50 rounded-lg">
                   <Award className="h-8 w-8 text-indigo-600 mr-4" />
                   <div>
                     <h3 className="font-semibold">Certificates</h3>
-                    <p className="text-sm text-gray-600">For all participants</p>
-                  </div>
-                </div>
-                <div className="flex items-center p-4 bg-indigo-50 rounded-lg">
-                  <Shield className="h-8 w-8 text-indigo-600 mr-4" />
-                  <div>
-                    <h3 className="font-semibold">Insurance Coverage</h3>
-                    <p className="text-sm text-gray-600">For all participants</p>
+                    <p className="text-sm text-gray-600">
+                      For all participants
+                    </p>
                   </div>
                 </div>
               </div>
@@ -141,48 +161,19 @@ const EventDetailPage = () => {
                 Detailed Information
               </h2>
               <div className="prose max-w-none text-gray-600">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Event Format</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  Event Description
+                </h3>
                 <p className="mb-4">
-                  This prestigious event follows international standards and regulations. Participants will compete in multiple rounds, with preliminary rounds followed by semifinals and finals. Professional judges and referees will oversee all competitions.
+                  {event.description}
                 </p>
 
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Facilities</h3>
-                <ul className="list-disc pl-5 mb-4">
-                  <li>State-of-the-art sports facilities</li>
-                  <li>Professional medical team on standby</li>
-                  <li>Dedicated warm-up areas</li>
-                  <li>Refreshments for participants</li>
-                  <li>Spectator seating with clear view</li>
-                  <li>Live scoring system</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Schedule</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="font-medium">Registration & Kit Collection</span>
-                    <span>8:00 AM - 9:30 AM</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="font-medium">Opening Ceremony</span>
-                    <span>9:30 AM - 10:00 AM</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="font-medium">Preliminary Rounds</span>
-                    <span>10:00 AM - 2:00 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="font-medium">Lunch Break</span>
-                    <span>2:00 PM - 3:00 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="font-medium">Finals</span>
-                    <span>3:00 PM - 5:00 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Prize Distribution</span>
-                    <span>5:30 PM - 6:00 PM</span>
-                  </div>
-                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  Prizes 
+                </h3>
+                <p className=" mb-4">
+                  {event.prizes}
+                </p>
               </div>
             </section>
 
@@ -194,25 +185,27 @@ const EventDetailPage = () => {
               </h2>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Eligibility</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    Eligibility
+                  </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                      <span>Must be a current student with valid college ID</span>
+                      <span>
+                        Must be a current student with valid college ID
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
                       <span>Age between 18-25 years</span>
                     </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                      <span>Medical fitness certificate required</span>
-                    </li>
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Equipment & Dress Code</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    Equipment & Dress Code
+                  </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
@@ -220,17 +213,24 @@ const EventDetailPage = () => {
                     </li>
                     <li className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                      <span>Participants must wear appropriate sports attire</span>
+                      <span>
+                        Participants must wear appropriate sports attire
+                      </span>
                     </li>
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Important Notes</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    Important Notes
+                  </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <AlertCircle className="h-5 w-5 text-yellow-500 mr-3 mt-1 flex-shrink-0" />
-                      <span>Participants must report 30 minutes before their scheduled time</span>
+                      <span>
+                        Participants must report 30 minutes before their
+                        scheduled time
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <AlertCircle className="h-5 w-5 text-yellow-500 mr-3 mt-1 flex-shrink-0" />
@@ -238,7 +238,10 @@ const EventDetailPage = () => {
                     </li>
                     <li className="flex items-start">
                       <AlertCircle className="h-5 w-5 text-yellow-500 mr-3 mt-1 flex-shrink-0" />
-                      <span>Any form of misbehavior will lead to immediate disqualification</span>
+                      <span>
+                        Any form of misbehavior will lead to immediate
+                        disqualification
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -288,20 +291,32 @@ const EventDetailPage = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl p-6 shadow-lg sticky top-24">
               <div className="mb-6">
-                <div className="text-2xl font-bold mb-2">Registration Details</div>
-                <div className="text-gray-600 mb-4">Deadline: {event.registrationDeadline}</div>
-                <div className={`text-lg font-semibold ${
-                  event.remainingSlots > 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {event.remainingSlots > 0 ? `${event.remainingSlots} slots remaining` : 'Registration Closed'}
+                <div className="text-2xl font-bold mb-2">
+                  Registration Details
+                </div>
+                <div className="text-gray-600 mb-4">
+                  Deadline till: {new Date(event.applyLastDate).toLocaleDateString()}
+                </div>
+                <div
+                  className={`text-lg font-semibold ${
+                    event.remainingSlots > 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {event.remainingSlots > 0
+                    ? `${event.remainingSlots} slots remaining`
+                    : "Registration Closed"}
                 </div>
                 <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
-                  <h3 className="font-semibold text-indigo-900 mb-2">Registration Fee</h3>
+                  <h3 className="font-semibold text-indigo-900 mb-2">
+                    Registration Fee
+                  </h3>
                   <div className="flex items-center text-indigo-600">
                     <IndianRupee className="h-5 w-5 mr-2" />
                     <span className="text-2xl font-bold">-</span>
                   </div>
-                  <p className="text-sm text-indigo-900 mt-2">Includes event kit & refreshments</p>
+                  <p className="text-sm text-indigo-900 mt-2">
+                    Includes event kit & refreshments
+                  </p>
                 </div>
               </div>
 
@@ -310,8 +325,8 @@ const EventDetailPage = () => {
                 disabled={event.remainingSlots === 0}
                 className={`w-full py-3 px-4 rounded-lg font-semibold text-center transition-all duration-300 ${
                   event.remainingSlots > 0
-                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                    ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                    : "bg-gray-300 cursor-not-allowed text-gray-500"
                 }`}
               >
                 Register Now
@@ -324,26 +339,36 @@ const EventDetailPage = () => {
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-2xl font-bold mb-6">Register for {event.title}</h3>
-              
+              <h3 className="text-2xl font-bold mb-6">
+                Register for {event.title}
+              </h3>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-gray-700 mb-2">Student ID *</label>
+                    <label className="block text-gray-700 mb-2">
+                      Student ID *
+                    </label>
                     <input
                       type="text"
                       value={formData.studentId}
-                      onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, studentId: e.target.value })
+                      }
                       className="w-full p-3 border rounded-lg"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-2">Full Name *</label>
+                    <label className="block text-gray-700 mb-2">
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       className="w-full p-3 border rounded-lg"
                       required
                     />
@@ -353,17 +378,23 @@ const EventDetailPage = () => {
                     <input
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       className="w-full p-3 border rounded-lg"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-2">Phone Number *</label>
+                    <label className="block text-gray-700 mb-2">
+                      Phone Number *
+                    </label>
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
                       className="w-full p-3 border rounded-lg"
                       required
                     />
@@ -371,31 +402,49 @@ const EventDetailPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-2">Previous Experience</label>
+                  <label className="block text-gray-700 mb-2">
+                    Previous Experience
+                  </label>
                   <textarea
                     value={formData.experience}
-                    onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, experience: e.target.value })
+                    }
                     className="w-full p-3 border rounded-lg"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-2">Emergency Contact *</label>
+                  <label className="block text-gray-700 mb-2">
+                    Coordinator Contac *
+                  </label>
                   <input
                     type="tel"
                     value={formData.emergencyContact}
-                    onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        emergencyContact: e.target.value,
+                      })
+                    }
                     className="w-full p-3 border rounded-lg"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-2">Medical Conditions</label>
+                  <label className="block text-gray-700 mb-2">
+                    Medical Conditions
+                  </label>
                   <textarea
                     value={formData.medicalConditions}
-                    onChange={(e) => setFormData({ ...formData, medicalConditions: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        medicalConditions: e.target.value,
+                      })
+                    }
                     className="w-full p-3 border rounded-lg"
                     rows={2}
                     placeholder="List any medical conditions or allergies"
@@ -408,11 +457,19 @@ const EventDetailPage = () => {
                       type="checkbox"
                       id="terms"
                       checked={formData.termsAccepted}
-                      onChange={(e) => setFormData({ ...formData, termsAccepted: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          termsAccepted: e.target.checked,
+                        })
+                      }
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       required
                     />
-                    <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="terms"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       I agree to the terms and conditions *
                     </label>
                   </div>
@@ -422,11 +479,19 @@ const EventDetailPage = () => {
                       type="checkbox"
                       id="rules"
                       checked={formData.rulesAccepted}
-                      onChange={(e) => setFormData({ ...formData, rulesAccepted: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          rulesAccepted: e.target.checked,
+                        })
+                      }
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       required
                     />
-                    <label htmlFor="rules" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="rules"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       I have read and agree to follow all event rules *
                     </label>
                   </div>
@@ -436,11 +501,19 @@ const EventDetailPage = () => {
                       type="checkbox"
                       id="liability"
                       checked={formData.liabilityAccepted}
-                      onChange={(e) => setFormData({ ...formData, liabilityAccepted: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          liabilityAccepted: e.target.checked,
+                        })
+                      }
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       required
                     />
-                    <label htmlFor="liability" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="liability"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       I accept the liability waiver *
                     </label>
                   </div>
@@ -450,11 +523,19 @@ const EventDetailPage = () => {
                       type="checkbox"
                       id="medical"
                       checked={formData.medicalAccepted}
-                      onChange={(e) => setFormData({ ...formData, medicalAccepted: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          medicalAccepted: e.target.checked,
+                        })
+                      }
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       required
                     />
-                    <label htmlFor="medical" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="medical"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       I confirm that I am medically fit to participate *
                     </label>
                   </div>

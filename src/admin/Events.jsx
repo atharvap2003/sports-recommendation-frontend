@@ -6,16 +6,19 @@ import { MdDelete } from "react-icons/md";
 function Events() {
   const navigate = useNavigate();
   const id = useSelector((state) => state.auth.id);
-  const email = useSelector((state) => state.auth.email)
+  const email = useSelector((state) => state.auth.email);
   const [showForm, setShowForm] = useState(false);
   const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
     startDate: "",
     endDate: "",
+    applyLastDate: "", // New field
     location: "",
     organizer: "",
     contact: "",
+    coordinator_name: "", // New field
+    coordinator_no: "", // New field
     description: "",
     rules: "",
     prizes: "",
@@ -54,7 +57,7 @@ function Events() {
 
     try {
       // Create payload with dummy _id (replace with actual user id as needed)
-      const payload = { ...formData, _id: id, createdBy: email};
+      const payload = { ...formData, _id: id, createdBy: email };
 
       const response = await fetch("http://localhost:5000/api/admin/events", {
         method: "POST",
@@ -75,9 +78,12 @@ function Events() {
           title: "",
           startDate: "",
           endDate: "",
+          applyLastDate: "", // Reset new field
           location: "",
           organizer: "",
           contact: "",
+          coordinator_name: "", // Reset new field
+          coordinator_no: "", // Reset new field
           description: "",
           rules: "",
           prizes: "",
@@ -99,13 +105,18 @@ function Events() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/events/${eventId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/admin/events/${eventId}`,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await response.json();
       if (response.ok && data.success) {
         // Remove the deleted event from the state
-        setEvents((prevEvents) => prevEvents.filter((event) => event._id !== eventId));
+        setEvents((prevEvents) =>
+          prevEvents.filter((event) => event._id !== eventId)
+        );
       } else {
         console.error("Error deleting event:", data.message);
       }
@@ -181,6 +192,21 @@ function Events() {
                 </div>
               </div>
 
+              {/* Last Date to Apply */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Last Date to Apply
+                </label>
+                <input
+                  type="date"
+                  name="applyLastDate"
+                  value={formData.applyLastDate}
+                  onChange={handleInputChange}
+                  className="input-search"
+                  required
+                />
+              </div>
+
               {/* Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -201,20 +227,14 @@ function Events() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Sports Category
                 </label>
-                <select
+                <input
+                  type="text"
                   name="sportsCategory"
                   value={formData.sportsCategory}
                   onChange={handleInputChange}
                   className="input-search"
                   required
-                >
-                  <option value="">Select a category</option>
-                  <option value="basketball">Basketball</option>
-                  <option value="football">Football</option>
-                  <option value="cricket">Cricket</option>
-                  <option value="tennis">Tennis</option>
-                  <option value="athletics">Athletics</option>
-                </select>
+                />
               </div>
 
               {/* Organizer */}
@@ -294,6 +314,36 @@ function Events() {
                 ></textarea>
               </div>
 
+              {/* Coordinator Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Coordinator Name
+                </label>
+                <input
+                  type="text"
+                  name="coordinator_name"
+                  value={formData.coordinator_name}
+                  onChange={handleInputChange}
+                  className="input-search"
+                  required
+                />
+              </div>
+
+              {/* Coordinator Mobile Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Coordinator Mobile Number
+                </label>
+                <input
+                  type="text"
+                  name="coordinator_no"
+                  value={formData.coordinator_no}
+                  onChange={handleInputChange}
+                  className="input-search"
+                  required
+                />
+              </div>
+
               {/* Form Buttons */}
               <div className="flex justify-end space-x-4 mt-6">
                 <button
@@ -328,10 +378,12 @@ function Events() {
                 <div className="space-y-2">
                   <p className="text-gray-600 dark:text-gray-400">
                     <span className="font-medium">Date:</span>{" "}
-                    {new Date(event.startDate).toLocaleDateString()}  -  {new Date(event.endDate).toLocaleDateString()}
+                    {new Date(event.startDate).toLocaleDateString()} -{" "}
+                    {new Date(event.endDate).toLocaleDateString()}
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Location:</span> {event.location}
+                    <span className="font-medium">Location:</span>{" "}
+                    {event.location}
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
                     <span className="font-medium">Participants:</span>{" "}

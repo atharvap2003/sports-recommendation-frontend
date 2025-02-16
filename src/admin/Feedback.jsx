@@ -79,7 +79,7 @@ function Feedback() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="input-filter"
+          className="input-filter p-2"
         >
           {categories.map((category) => (
             <option key={category} value={category}>

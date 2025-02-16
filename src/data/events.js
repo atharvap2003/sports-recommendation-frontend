@@ -11,8 +11,7 @@ export const events = [
       "Join us for the biggest athletic event of the year featuring track and field competitions across multiple categories. Compete in sprints, long-distance running, high jump, long jump, and more. Professional track certification and electronic timing system available.",
     image:
       "https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 500,
-    remainingSlots: 324,
+    status: true
   },
   {
     id: 2,
@@ -26,8 +25,7 @@ export const events = [
       "Compete against the best basketball teams from colleges across the region in this high-energy tournament. Professional referees, live scoring, and streaming available. Form your team of 12 players and showcase your skills!",
     image:
       "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 16,
-    remainingSlots: 9,
+    status: true
   },
   {
     id: 3,
@@ -41,8 +39,7 @@ export const events = [
       "Showcase your swimming prowess in multiple categories including freestyle, butterfly, and relay races. Olympic-size pool with electronic timing system. Categories for beginners to advanced swimmers.",
     image:
       "https://images.unsplash.com/photo-1519315901367-f34ff9154487?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 200,
-    remainingSlots: 156,
+    status: true
   },
   {
     id: 4,
@@ -56,8 +53,7 @@ export const events = [
       "Experience the thrill of T20 cricket in this week-long tournament featuring the best college teams. Professional umpires, live commentary, and streaming available. Form your team of 15 players and compete for the trophy!",
     image:
       "https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 12,
-    remainingSlots: 7,
+    status: true
   },
   {
     id: 5,
@@ -71,8 +67,7 @@ export const events = [
       "Join the prestigious martial arts championship featuring multiple disciplines including Karate, Taekwondo, and Judo. Professional referees and safety equipment provided. Categories based on weight and belt levels.",
     image:
       "https://images.unsplash.com/photo-1555597673-b21d5c935865?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 150,
-    remainingSlots: 98,
+    status: true
   },
   {
     id: 6,
@@ -86,8 +81,7 @@ export const events = [
       "Challenge yourself in this week-long fitness event featuring CrossFit-style workouts, strength competitions, and endurance challenges. Professional trainers and medical staff on-site. Daily prizes and overall championship title.",
     image:
       "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 300,
-    remainingSlots: 245,
+    status: true
   },
   {
     id: 7,
@@ -101,8 +95,7 @@ export const events = [
       "Compete in singles and doubles categories in this fast-paced table tennis tournament. Professional tables and equipment provided. Categories for beginners and advanced players.",
     image:
       "https://images.unsplash.com/photo-1534158914592-062992fbe900?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 100,
-    remainingSlots: 76,
+    status: true
   },
   {
     id: 8,
@@ -116,7 +109,6 @@ export const events = [
       "Experience the thrill of adventure sports including rock climbing, rappelling, obstacle courses, and zip-lining. Professional instructors and safety equipment provided. Perfect for adrenaline enthusiasts!",
     image:
       "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-    slots: 200,
-    remainingSlots: 167,
+    status : false,
   },
 ];

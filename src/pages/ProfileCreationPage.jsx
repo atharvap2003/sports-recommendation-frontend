@@ -30,15 +30,7 @@ const ProfileCreationPage = () => {
     address: "",
   });
 
-  const departments = [
-    "IT",
-    "CS",
-    "EnTC",
-    "Mech",
-    "Biotech",
-    "Electrical",
-    "Civil",
-  ];
+  const departments = ["IT","CS","EnTC","Mech","Biotech","Electrical","Civil"];
   const years = ["FE", "SE", "TE", "BE"];
 
   const handleFileChange = (e, type) => {
@@ -122,7 +114,7 @@ const ProfileCreationPage = () => {
         console.error("Error submitting profile:", error);
         alert("Error creating profile, try again later.");
       }
-    }, 5000); // Wait for 5 seconds
+    }, 3000);
   };
 
   const handleInputChange = (e) => {

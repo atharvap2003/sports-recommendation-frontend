@@ -72,16 +72,18 @@ const Navbar = () => {
               >
                 Achievements
               </Link>
-              <Link
-                to={userType === "admin" ? "/admin" : "/profile-page"}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(userType === "admin" ? "/admin" : "/profile-page")
-                    ? "bg-indigo-800 text-white"
-                    : "hover:bg-indigo-800"
-                }`}
-              >
-                {userType === "admin" ? "Admin-Dashboard" : "Profile"}
-              </Link>
+              {userType !== null && (
+                <Link
+                  to={userType === "admin" ? "/admin" : "/profile-page"}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive(userType === "admin" ? "/admin" : "/profile-page")
+                      ? "bg-indigo-800 text-white"
+                      : "hover:bg-indigo-800"
+                  }`}
+                >
+                  {userType === "admin" ? "Admin-Dashboard" : "Profile"}
+                </Link>
+              )}
             </div>
           </div>
 
