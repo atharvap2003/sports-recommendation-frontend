@@ -56,7 +56,7 @@ const HeroSection = () => {
                 onClick={handleCreateAccountClick}
                 className="px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 backdrop-blur-sm transform hover:scale-105 transition-all duration-300"
               >
-                Create Account
+                Sign In
               </button>
             </div>
 

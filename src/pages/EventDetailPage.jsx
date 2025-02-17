@@ -1,64 +1,55 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Calendar,
   MapPin,
-  Users,
   Clock,
-  Trophy,
   Award,
-  Target,
   CheckCircle,
   AlertCircle,
   Info,
   Star,
-  Shield,
   Clipboard,
   Medal,
-  DollarSign,
   User,
   Phone,
   Mail,
   Heart,
-  IndianRupee,
 } from "lucide-react";
-import { events } from "../data/events";
 
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const event = events.find((e) => e.id === parseInt(id));
-  let date;
-  const [event, setEventDetails] = useState();
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/api/user/getevent/${id}`);
-        const data = await response.json();
-        if (data.success) {
-          setEventDetails(data.event)
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchEventDetails();
-  },[id]);
-  
+  const [event, setEventDetails] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    studentId: "",
-    name: "",
-    email: "",
-    phone: "",
-    category: "",
-    experience: "",
-    emergencyContact: "",
-    medicalConditions: "",
     termsAccepted: false,
     rulesAccepted: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [showForm, setShowForm] = useState(false);
+  // Retrieve the current user from Redux (ensure your auth reducer has the user object)
+  const currentUser = useSelector((state) => state.auth.id);
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/user/getevent/${id}`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setEventDetails(data.event);
+        } else {
+          console.error("Error fetching event details:", data.message);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
+    fetchEventDetails();
+  }, [id]);
 
   if (!event) {
     return (
@@ -78,16 +69,50 @@ const EventDetailPage = () => {
     );
   }
 
-  const handleSubmit = (e) => {
+  // Handle registration form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registration submitted:", formData);
-    setShowForm(false);
+  
+    if (!currentUser) {
+      alert("User not authenticated");
+      return;
+    }
+  
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/user/getevent/register-event/${event._id}/${currentUser}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+  
+      // Check if response is JSON
+      const textResponse = await response.text();
+      console.log("Raw Response:", textResponse);
+  
+      const data = JSON.parse(textResponse); // Convert to JSON
+      console.log("Parsed JSON:", data);
+  
+      if (response.ok) {
+        alert("Registration successful!");
+        setShowForm(false);
+      } else {
+        alert(data.message || "Error occurred during registration");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("An error occurred during registration. Please try again later.");
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-
         <div className="relative h-[300px] rounded-xl overflow-hidden mb-8">
           <img
             src="https://tiemdelhi.com/blogs/wp-content/uploads/2023/03/sports-1024x683.jpg"
@@ -108,7 +133,8 @@ const EventDetailPage = () => {
               <div className="flex flex-wrap gap-6 text-white">
                 <span className="flex items-center">
                   <Calendar className="h-5 w-5 mr-2" />
-                  {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                  {new Date(event.startDate).toLocaleDateString()} -{" "}
+                  {new Date(event.endDate).toLocaleDateString()}
                 </span>
                 <span className="flex items-center">
                   <MapPin className="h-5 w-5 mr-2" />
@@ -116,7 +142,8 @@ const EventDetailPage = () => {
                 </span>
                 <span className="flex items-center">
                   <Clock className="h-5 w-5 mr-2" />
-                  Registration Deadline: {new Date(event.applyLastDate).toLocaleDateString()}
+                  Registration Deadline:{" "}
+                  {new Date(event.applyLastDate).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -164,16 +191,12 @@ const EventDetailPage = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
                   Event Description
                 </h3>
-                <p className="mb-4">
-                  {event.description}
-                </p>
+                <p className="mb-4">{event.description}</p>
 
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Prizes 
+                  Prizes
                 </h3>
-                <p className=" mb-4">
-                  {event.prizes}
-                </p>
+                <p className="mb-4">{event.prizes}</p>
               </div>
             </section>
 
@@ -295,41 +318,31 @@ const EventDetailPage = () => {
                   Registration Details
                 </div>
                 <div className="text-gray-600 mb-4">
-                  Deadline till: {new Date(event.applyLastDate).toLocaleDateString()}
-                </div>
-                <div
-                  className={`text-lg font-semibold ${
-                    event.remainingSlots > 0 ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {event.remainingSlots > 0
-                    ? `${event.remainingSlots} slots remaining`
-                    : "Registration Closed"}
+                  Deadline till:{" "}
+                  {new Date(event.applyLastDate).toLocaleDateString()}
                 </div>
                 <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
                   <h3 className="font-semibold text-indigo-900 mb-2">
-                    Registration Fee
+                    Registration
                   </h3>
-                  <div className="flex items-center text-indigo-600">
-                    <IndianRupee className="h-5 w-5 mr-2" />
-                    <span className="text-2xl font-bold">-</span>
-                  </div>
                   <p className="text-sm text-indigo-900 mt-2">
-                    Includes event kit & refreshments
+                    Includes event kit (*after successful selection).
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setShowForm(true)}
-                disabled={event.remainingSlots === 0}
+                disabled={new Date(event.applyLastDate) < new Date()}
                 className={`w-full py-3 px-4 rounded-lg font-semibold text-center transition-all duration-300 ${
-                  event.remainingSlots > 0
+                  new Date(event.applyLastDate) >= new Date()
                     ? "bg-indigo-600 hover:bg-indigo-700 text-white"
                     : "bg-gray-300 cursor-not-allowed text-gray-500"
                 }`}
               >
-                Register Now
+                {new Date(event.applyLastDate) >= new Date()
+                  ? "Register Now"
+                  : "Registration Closed"}
               </button>
             </div>
           </div>
@@ -344,113 +357,6 @@ const EventDetailPage = () => {
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Student ID *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.studentId}
-                      onChange={(e) =>
-                        setFormData({ ...formData, studentId: e.target.value })
-                      }
-                      className="w-full p-3 border rounded-lg"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full p-3 border rounded-lg"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">Email *</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="w-full p-3 border rounded-lg"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      className="w-full p-3 border rounded-lg"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-2">
-                    Previous Experience
-                  </label>
-                  <textarea
-                    value={formData.experience}
-                    onChange={(e) =>
-                      setFormData({ ...formData, experience: e.target.value })
-                    }
-                    className="w-full p-3 border rounded-lg"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-2">
-                    Coordinator Contac *
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.emergencyContact}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        emergencyContact: e.target.value,
-                      })
-                    }
-                    className="w-full p-3 border rounded-lg"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-2">
-                    Medical Conditions
-                  </label>
-                  <textarea
-                    value={formData.medicalConditions}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        medicalConditions: e.target.value,
-                      })
-                    }
-                    className="w-full p-3 border rounded-lg"
-                    rows={2}
-                    placeholder="List any medical conditions or allergies"
-                  />
-                </div>
-
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <input
@@ -495,58 +401,15 @@ const EventDetailPage = () => {
                       I have read and agree to follow all event rules *
                     </label>
                   </div>
-
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="liability"
-                      checked={formData.liabilityAccepted}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          liabilityAccepted: e.target.checked,
-                        })
-                      }
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                      required
-                    />
-                    <label
-                      htmlFor="liability"
-                      className="ml-2 block text-sm text-gray-900"
-                    >
-                      I accept the liability waiver *
-                    </label>
-                  </div>
-
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="medical"
-                      checked={formData.medicalAccepted}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          medicalAccepted: e.target.checked,
-                        })
-                      }
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                      required
-                    />
-                    <label
-                      htmlFor="medical"
-                      className="ml-2 block text-sm text-gray-900"
-                    >
-                      I confirm that I am medically fit to participate *
-                    </label>
-                  </div>
                 </div>
 
                 <div className="flex gap-4">
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition-all duration-300"
                   >
-                    Submit Registration
+                    {isSubmitting ? "Submitting..." : "Submit Registration"}
                   </button>
                   <button
                     type="button"
