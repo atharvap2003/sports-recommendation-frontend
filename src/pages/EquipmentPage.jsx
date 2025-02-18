@@ -1,102 +1,50 @@
-import React, { useState } from "react";
-import { Search, Filter, Dumbbell } from "lucide-react";
-
-const equipmentList = [
-  {
-    id: 1,
-    name: "Basketball",
-    category: "Team Sports",
-    total: 20,
-    available: 15,
-    condition: "Excellent",
-    image:
-      "https://images.unsplash.com/photo-1733481278677-c381d277a4b1?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 2,
-    name: "Cricket Kit",
-    category: "Team Sports",
-    total: 10,
-    available: 8,
-    condition: "Good",
-    image:
-      "https://plus.unsplash.com/premium_photo-1722351690086-b42310f14c14?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 3,
-    name: "Tennis Racket",
-    category: "Individual Sports",
-    total: 15,
-    available: 12,
-    condition: "Excellent",
-    image:
-      "https://media.istockphoto.com/id/1184203343/photo/close-up-of-black-modern-rackets-with-light-green-ball-lying-on-tennis-court-floor-sport-and.jpg?s=2048x2048&w=is&k=20&c=WlXMJiWmAZkb-RB-uG4H0a4Cp-MQcUOjKln73Uoy6aQ=",
-  },
-  {
-    id: 4,
-    name: "Football",
-    category: "Team Sports",
-    total: 25,
-    available: 20,
-    condition: "Good",
-    image:
-      "https://images.unsplash.com/photo-1552318965-6e6be7484ada?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    id: 5,
-    name: "Cricket Ball",
-    category: "Team Sports",
-    total: 25,
-    available: 20,
-    condition: "Good",
-    image:
-      "https://media.istockphoto.com/id/157441568/photo/new-cricket-ball.jpg?s=2048x2048&w=is&k=20&c=cycGZweA3HzmRMIcdZBUtOxfAp0aYrcGP4J0Uwln1z4=",
-  },
-  {
-    id: 6,
-    name: "Cricket Ball",
-    category: "Team Sports",
-    total: 25,
-    available: 20,
-    condition: "Good",
-    image:
-      "https://plus.unsplash.com/premium_photo-1679917506577-6c986f6faab6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Q3JpY2tldCUyMGJhdHxlbnwwfHwwfHx8MA%3D%3D",
-  },
-  {
-    id: 7,
-    name: "Vollyball",
-    category: "Team Sports",
-    total: 25,
-    available: 20,
-    condition: "Good",
-    image:
-      "https://media.istockphoto.com/id/1929880938/photo/volleyball.webp?s=2048x2048&w=is&k=20&c=oVoGG4jJk-lPigKjzc2p2EFjL9v_9PMGC484DYPFzdM=",
-  },
-  {
-    id: 6,
-    name: "Basketball",
-    category: "Team Sports",
-    total: 25,
-    available: 20,
-    condition: "Good",
-    image:
-      "https://media.istockphoto.com/id/1636022764/photo/basketball-ball.webp?s=2048x2048&w=is&k=20&c=-OfPLc9FOl9Jehwrs3Ldvj5xBk3ttfNXY1-nHSbHhTk=",
-  },
-];
+import React, { useState, useEffect } from "react";
+import { Search, Filter } from "lucide-react";
+import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
 const EquipmentPage = () => {
+  const [equipmentList, setEquipmentList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
+  const navigate = useNavigate();
+
+  const id = useSelector((state) => state.auth["id"]);
+
   const [formData, setFormData] = useState({
-    studentId: "",
-    purpose: "",
-    duration: "",
+    _id: id,
+    reason: "",
+    duration: 1,
     quantity: 1,
+    equipment_id: "",
   });
 
-  const categories = ["All", "Team Sports", "Individual Sports"];
+  useEffect(() => {
+    fetch("http://localhost:5000/api/user/equipment")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setEquipmentList(
+            data.data.map((item) => ({
+              id: item._id,
+              name: item.equipmentname,
+              total: item.TotalQuantity,
+              available: item.availableQuantity,
+              isAvailable: item.isAvailable,
+              category: "Sports Equipment",
+              image: "https://via.placeholder.com/150",
+            }))
+          );
+        }
+      })
+      .catch((error) => console.error("Error fetching equipment:", error));
+  }, []);
+
+  const categories = ["All", "Sports Equipment"];
 
   const filteredEquipment = equipmentList.filter((item) => {
     const matchesSearch = item.name
@@ -109,19 +57,54 @@ const EquipmentPage = () => {
 
   const handleRequest = (equipment) => {
     setSelectedEquipment(equipment);
+    setFormData((prevData) => ({
+      ...prevData,
+      equipment_id: equipment.id,
+      quantity: 1,
+    }));
     setShowRequestForm(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log({ equipment: selectedEquipment, ...formData });
-    setShowRequestForm(false);
-    setFormData({ studentId: "", purpose: "", duration: "", quantity: 1 });
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/user/equipment/request-equipment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Request submitted successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        setShowRequestForm(false);
+      } else {
+        toast.error("Request failed: " + data.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error submitting request:", error);
+      toast.error("Server error. Try again later.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
+      <ToastContainer />
       <div className="max-w-7xl mx-auto mt-4">
         <div className="flex justify-between items-center">
           <div className="text-left mb-12">
@@ -132,8 +115,6 @@ const EquipmentPage = () => {
               Browse and request equipment for your training
             </p>
           </div>
-
-          {/* Search and Filter */}
           <div className="mb-8 flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -142,7 +123,7 @@ const EquipmentPage = () => {
                 placeholder="Search equipment..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -150,7 +131,7 @@ const EquipmentPage = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -161,7 +142,6 @@ const EquipmentPage = () => {
             </div>
           </div>
         </div>
-        {/* Equipment Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredEquipment.map((equipment) => (
             <div
@@ -193,118 +173,76 @@ const EquipmentPage = () => {
                     {equipment.available > 0 ? "Available" : "Out of Stock"}
                   </span>
                 </div>
-
                 <div className="space-y-2 mb-6">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Total Units:</span>
-                    <span>{equipment.total}</span>
-                  </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Available:</span>
                     <span>{equipment.available}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Condition:</span>
-                    <span>{equipment.condition}</span>
-                  </div>
                 </div>
-
                 <button
-                  onClick={() => handleRequest(equipment)}
-                  disabled={equipment.available === 0}
+                  onClick={() => {
+                    if (!id) {
+                      toast.error("Sign in required!", {
+                        position: "top-right",
+                        autoClose: 3000,
+                      });
+                    } else {
+                      handleRequest(equipment);
+                    }
+                  }}
+                  disabled={equipment.available === 0 || !id}
                   className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${
-                    equipment.available > 0
-                      ? "bg-indigo-900 hover:bg-indigo-950 text-white"
-                      : "bg-gray-300 cursor-not-allowed text-gray-500"
+                    equipment.available > 0 && id
+                      ? "bg-indigo-900 hover:bg-indigo-700 text-white"
+                      : "bg-gray-400 text-gray-700 cursor-not-allowed"
                   }`}
                 >
-                  Request Equipment
+                  Request
                 </button>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Request Form Modal */}
-        {showRequestForm && selectedEquipment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-8 max-w-md w-full">
-              <h3 className="text-2xl font-bold mb-6">
-                Request {selectedEquipment.name}
-              </h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-gray-700 mb-2">Student ID</label>
-                  <input
-                    type="text"
-                    value={formData.studentId}
-                    onChange={(e) =>
-                      setFormData({ ...formData, studentId: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Purpose</label>
-                  <textarea
-                    value={formData.purpose}
-                    onChange={(e) =>
-                      setFormData({ ...formData, purpose: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">
-                    Duration (days)
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.duration}
-                    onChange={(e) =>
-                      setFormData({ ...formData, duration: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg"
-                    min="1"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Quantity</label>
-                  <input
-                    type="number"
-                    value={formData.quantity}
-                    onChange={(e) =>
-                      setFormData({ ...formData, quantity: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg"
-                    min="1"
-                    max={selectedEquipment.available}
-                    required
-                  />
-                </div>
-                <div className="flex space-x-4 mt-6">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg"
-                  >
-                    Submit Request
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowRequestForm(false)}
-                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
+      {showRequestForm && selectedEquipment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-6">
+              Request {selectedEquipment.name}
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  Reason of Use:
+                </label>
+                <textarea
+                  value={formData.reason}
+                  onChange={(e) =>
+                    setFormData({ ...formData, reason: e.target.value })
+                  }
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+              </div>
+              <div className="flex space-x-4 mt-6">
+                <button
+                  type="submit"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg"
+                >
+                  Submit Request
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowRequestForm(false)}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
