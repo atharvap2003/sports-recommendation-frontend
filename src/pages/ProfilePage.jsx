@@ -20,7 +20,7 @@ const ProfilePage = () => {
       { title: "Best Athlete Award", year: "2022" },
     ],
     participationHistory: [
-      { event: "Intercollege Game Fest 2023", rank: "Runner-up" },
+      { event: "Intercollege Game Fest 2023" },
     ],
     profileImage: null,
     aadharCard: null, // Store URL or data
@@ -249,11 +249,6 @@ const ProfilePage = () => {
                       <label className="text-gray-500 text-sm">Event</label>
                       <p className="text-gray-800">{history.event}</p>
                     </div>
-
-                    <div className="flex flex-col">
-                      <label className="text-gray-500 text-sm">Rank</label>
-                      <p className="text-gray-800">{history.rank}</p>
-                    </div>
                   </div>
                 ))
               ) : (
@@ -266,29 +261,7 @@ const ProfilePage = () => {
               <h2 className="text-2xl font-bold mb-4">
                 Identification Documents
               </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                  <label className="text-gray-500 text-sm capitalize">
-                    Aadhar Card
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="file"
-                      className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-black"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleImageUpload("aadharCard", e.target.files[0])
-                      }
-                    />
-                  ) : (
-                    <p className="text-gray-800">
-                      {profile.aadharCard
-                        ? "Aadhar Card uploaded"
-                        : "No Aadhar Card uploaded"}
-                    </p>
-                  )}
-                </div>
-
+              <div className="grid grid-cols-2">
                 <div className="flex flex-col col-span-2">
                   <label className="text-gray-500 text-sm capitalize">
                     College Fee Receipt

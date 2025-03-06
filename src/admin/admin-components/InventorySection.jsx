@@ -160,7 +160,7 @@ function InventorySection() {
         <p className="text-red-500">{inventoryError}</p>
       ) : (
         // Container limited to about 6 items (max-height set to 480px) with vertical scroll
-        <div className="space-y-4 overflow-y-auto max-h-[400px]">
+        <div className="space-y-4 overflow-y-auto max-h-[480px]">
           {filteredInventory.length > 0 ? (
             filteredInventory.map((item) => (
               <div

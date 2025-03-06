@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSearch, FaTrash } from "react-icons/fa";
+import { FaSearch, FaTrash, FaCheck } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
 
 function Users() {
   const navigate = useNavigate();
@@ -17,7 +18,6 @@ function Users() {
     year: "",
   });
 
-  // Fetch users from backend
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -38,8 +38,13 @@ function Users() {
 
       const data = await response.json();
       console.log(data);
-      
-      setUsers(data.users);
+
+      // Sort users: Not approved users first
+      const sortedUsers = data.users.sort(
+        (a, b) => a.isVerifiedByAdmin - b.isVerifiedByAdmin
+      );
+
+      setUsers(sortedUsers);
       setTotalPages(data.pagination.totalPages);
       setError(null);
     } catch (error) {
@@ -49,12 +54,10 @@ function Users() {
     }
   };
 
-  // Fetch users when page, limit, or filters change
   useEffect(() => {
     fetchUsers();
   }, [page, limit, filters]);
 
-  // Handle search
   const filteredUsers = users.filter((user) =>
     user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -65,38 +68,70 @@ function Users() {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/admin/deleteUser/${userId}`,
+          `http://localhost:5000/api/admin/users/deleteUser/${userId}`,
           {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
         );
         if (!response.ok) {
+          console.log(response);
           throw new Error("Failed to delete user");
         }
-        fetchUsers(); // Refresh the user list after deletion
+        if (response) {
+          fetchUsers();
+        }
       } catch (error) {
         setError(error.message);
       }
     }
   };
 
-  // Handle user click
   const handleUserClick = (userId) => {
     navigate(`/admin/users/${userId}`);
   };
 
-  // Handle filter change
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
     }));
-    setPage(1); // Reset to first page when filters change
+    setPage(1);
+  };
+
+  const handleApprove = async (e, userId) => {
+    if (window.confirm("Are you sure you Approve this user?")) {
+      e.stopPropagation();
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/admin/users/approveUser/${userId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to approve user");
+        }
+        if (response) {
+          fetchUsers();
+          toast.success("User approved successfully!");
+        }
+      } catch (error) {
+        setError(error.message);
+        toast.error("Failed to approve user");
+      }
+    }
   };
 
   return (
     <div className="content-area">
+      <ToastContainer />
       <h1 className="page-title">Users Management</h1>
 
       <div className="card">
@@ -176,6 +211,9 @@ function Users() {
                       Mobile Number
                     </th>
                     <th className="px-6 py-3 text-left text-gray-500 dark:text-gray-300">
+                      User Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-gray-500 dark:text-gray-300">
                       Actions
                     </th>
                   </tr>
@@ -196,12 +234,23 @@ function Users() {
                       <td className="px-6 py-4 text-gray-800 dark:text-gray-300">
                         {user.mobile_number}
                       </td>
+                      <td className="px-6 py-4 text-gray-800 dark:text-gray-300">
+                        {user.user_type}
+                      </td>
                       <td className="px-6 py-4">
+                        {user.isVerifiedByAdmin || (
+                          <button
+                            onClick={(e) => handleApprove(e, user._id)}
+                            className="text-green-600 hover:text-green-800 m-2"
+                          >
+                            <FaCheck /> Approve
+                          </button>
+                        )}
                         <button
                           onClick={(e) => handleDelete(e, user._id)} // Pass user.id correctly
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 m-2"
                         >
-                          <FaTrash />
+                          <FaTrash /> Delete
                         </button>
                       </td>
                     </tr>
@@ -210,22 +259,21 @@ function Users() {
               </table>
             </div>
 
-            {/* Pagination Controls */}
             <div className="flex justify-between items-center mt-6">
               <button
                 onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                 disabled={page === 1}
-                className="pagination-button"
+                className="pagination-button dark:text-white cursor-pointer"
               >
                 Previous
               </button>
-              <span>
+              <span className="dark:text-white">
                 Page {page} of {totalPages}
               </span>
               <button
                 onClick={() => setPage((prev) => prev + 1)}
                 disabled={page === totalPages}
-                className="pagination-button"
+                className="pagination-button dark:text-white cursor-pointer"
               >
                 Next
               </button>

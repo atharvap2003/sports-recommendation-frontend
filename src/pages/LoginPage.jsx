@@ -48,12 +48,15 @@ const LoginPage = () => {
       
 
       const { user, token } = response.data;
-
+      console.log(response.data);
+      
       dispatch(setAuth({ 
         id: user.id, 
         email: user.email, 
         user_type: user.user_type, 
-        token 
+        token,
+        isVerifiedByAdmin: user.isVerifiedByAdmin,
+        registered_events: user.registeredEvents,
       }));
       // Redirect based on user type
       if (user.user_type === "Admin") {

@@ -28,9 +28,19 @@ const ProfileCreationPage = () => {
     age: "",
     description: "",
     address: "",
+    sports_interest: "",
+    achievements: "",
   });
 
-  const departments = ["IT","CS","EnTC","Mech","Biotech","Electrical","Civil"];
+  const departments = [
+    "IT",
+    "CS",
+    "EnTC",
+    "Mech",
+    "Biotech",
+    "Electrical",
+    "Civil",
+  ];
   const years = ["FE", "SE", "TE", "BE"];
 
   const handleFileChange = (e, type) => {
@@ -89,18 +99,23 @@ const ProfileCreationPage = () => {
           age: formData.age,
           description: formData.description,
           address: formData.address,
+          sports_interest: formData.sports_interest,
+          achievements: formData.achievements,
         };
 
         console.log(dataToPost);
 
-        const response = await fetch("http://localhost:5000/api/auth/create-profile", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Pass the token here
-          },
-          body: JSON.stringify(dataToPost),
-        });
+        const response = await fetch(
+          "http://localhost:5000/api/auth/create-profile",
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // Pass the token here
+            },
+            body: JSON.stringify(dataToPost),
+          }
+        );
 
         const result = await response.json();
 
@@ -114,7 +129,7 @@ const ProfileCreationPage = () => {
         console.error("Error submitting profile:", error);
         alert("Error creating profile, try again later.");
       }
-    }, 3000);
+    }, 2000);
   };
 
   const handleInputChange = (e) => {
@@ -160,6 +175,7 @@ const ProfileCreationPage = () => {
                   className="hidden"
                   accept="image/*"
                   onChange={(e) => handleFileChange(e, "profilePic")}
+                  required
                 />
               </label>
             </div>
@@ -178,6 +194,7 @@ const ProfileCreationPage = () => {
                   className="w-full p-3 border rounded-lg"
                   name="department"
                   onChange={handleInputChange}
+                  required
                 >
                   <option value="">Select Department</option>
                   {departments.map((dept, index) => (
@@ -193,6 +210,7 @@ const ProfileCreationPage = () => {
                   className="w-full p-3 border rounded-lg"
                   name="currentYear"
                   onChange={handleInputChange}
+                  required
                 >
                   <option value="">Select Year</option>
                   {years.map((year, index) => (
@@ -209,6 +227,7 @@ const ProfileCreationPage = () => {
                   name="age"
                   className="w-full p-3 border rounded-lg"
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -225,22 +244,60 @@ const ProfileCreationPage = () => {
                 <label className="block text-gray-700 mb-2">Description</label>
                 <textarea
                   className="w-full p-3 border rounded-lg"
-                  rows={3}
+                  rows={2}
                   minLength={10}
-                  maxLength={300}
+                  maxLength={250}
                   name="description"
                   onChange={handleInputChange}
+                  required
                 ></textarea>
               </div>
               <div>
                 <label className="block text-gray-700 mb-2">Address</label>
                 <textarea
                   className="w-full p-3 border rounded-lg"
-                  rows={3}
+                  rows={2}
                   minLength={10}
-                  maxLength={300}
+                  maxLength={250}
                   name="address"
                   onChange={handleInputChange}
+                  required
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          {/* Sports Interest and Achievements */}
+          <div className="bg-white rounded-xl p-8 shadow-lg">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Info className="h-6 w-6 text-indigo-600" /> Sports Interest &
+              Achievements
+            </h2>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  Sports Interest (put like Chess, Cricket, Volleyball, etc.)
+                </label>
+                <textarea
+                  className="w-full p-3 border rounded-lg"
+                  rows={1}
+                  minLength={10}
+                  maxLength={100}
+                  name="sports_interest"
+                  onChange={handleInputChange}
+                  required
+                ></textarea>
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Achievements (put like Achievement 1, Achievement 2, etc.)</label>
+                <textarea
+                  className="w-full p-3 border rounded-lg"
+                  rows={2}
+                  minLength={10}
+                  maxLength={300}
+                  name="achievements"
+                  onChange={handleInputChange}
+                  required
                 ></textarea>
               </div>
             </div>
@@ -263,6 +320,7 @@ const ProfileCreationPage = () => {
                     className="hidden"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => handleFileChange(e, "feeReceipt")}
+                    required
                   />
                   <div className="w-full p-3 border rounded-lg cursor-pointer">
                     Upload Fee Receipt

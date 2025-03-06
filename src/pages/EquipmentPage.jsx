@@ -14,6 +14,9 @@ const EquipmentPage = () => {
   const navigate = useNavigate();
 
   const id = useSelector((state) => state.auth["id"]);
+  const isVerifiedByAdmin = useSelector(
+    (state) => state.auth.isVerifiedByAdmin
+  );
 
   const [formData, setFormData] = useState({
     _id: id,
@@ -36,7 +39,7 @@ const EquipmentPage = () => {
               available: item.availableQuantity,
               isAvailable: item.isAvailable,
               category: "Sports Equipment",
-              image: "https://via.placeholder.com/150",
+              image: item.image,
             }))
           );
         }
@@ -126,20 +129,6 @@ const EquipmentPage = () => {
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500"
               />
             </div>
-            <div className="flex items-center gap-4">
-              <Filter className="text-gray-400 h-5 w-5" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500"
-              >
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -186,13 +175,18 @@ const EquipmentPage = () => {
                         position: "top-right",
                         autoClose: 3000,
                       });
+                    } else if (!isVerifiedByAdmin) {
+                      toast.warning("Your profile is not yet approved!", {
+                        position: "top-right",
+                        autoClose: 3000,
+                      });
                     } else {
                       handleRequest(equipment);
                     }
                   }}
                   disabled={equipment.available === 0 || !id}
                   className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${
-                    equipment.available > 0 && id
+                    equipment.available > 0 && id && isVerifiedByAdmin
                       ? "bg-indigo-900 hover:bg-indigo-700 text-white"
                       : "bg-gray-400 text-gray-700 cursor-not-allowed"
                   }`}

@@ -2,6 +2,8 @@ import React from "react";
 import { Play, Award, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const HeroSection = () => {
   const stats = [
@@ -11,24 +13,33 @@ const HeroSection = () => {
   ];
 
   const navigate = useNavigate();
-  
+
   // Get token from Redux state
   const token = useSelector((state) => state.auth.token);
 
   const handleCreateAccountClick = () => {
     if (token) {
-      // If token exists, show alert and prevent navigation
-      alert("You are logged in!");
+      // Show toast notification
+      toast.info("You are logged in!", {
+        position: "top-right",
+        autoClose: 2900,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
     } else {
-      // Otherwise, allow the navigation
       navigate("/login");
     }
   };
 
   return (
     <>
-      <div className="relative min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900">
+      {/* ToastContainer must be present for toasts to show */}
+      <ToastContainer />
 
+      <div className="relative min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-950/80 to-purple-900/80 backdrop-blur-sm"></div>
         </div>
@@ -76,8 +87,6 @@ const HeroSection = () => {
               ))}
             </div>
           </div>
-
-          {/* Scroll indicator */}
         </div>
       </div>
     </>

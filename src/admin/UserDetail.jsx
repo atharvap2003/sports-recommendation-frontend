@@ -105,7 +105,7 @@ function UserDetail() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-gray-500 dark:text-gray-400">
-                    Primary Sport
+                    Sport Interest
                   </label>
                   <p className="text-gray-800 dark:text-gray-300">
                     {user.sport}
@@ -113,26 +113,10 @@ function UserDetail() {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-500 dark:text-gray-400">
-                    Join Date
+                    Profile Creation Date :
                   </label>
                   <p className="text-gray-800 dark:text-gray-300">
                     {new Date(user.joinDate).toLocaleDateString()}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500 dark:text-gray-400">
-                    Membership Type
-                  </label>
-                  <p className="text-gray-800 dark:text-gray-300">
-                    {user.membership}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-500 dark:text-gray-400">
-                    Attendance Rate
-                  </label>
-                  <p className="text-gray-800 dark:text-gray-300">
-                    {user.attendance}
                   </p>
                 </div>
               </div>

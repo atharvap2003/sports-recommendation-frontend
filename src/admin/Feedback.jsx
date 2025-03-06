@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FaTrash } from "react-icons/fa";
 
 function Feedback() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -44,13 +45,37 @@ function Feedback() {
   // Pagination calculations
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentFeedbacks = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
+  const currentFeedbacks = filteredFeedbacks.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredFeedbacks.length / itemsPerPage);
 
   // Reset to first page when category changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory]);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this feedback?")) {
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/feedback/delete/${id}`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete feedback");
+      }
+  
+      setFeedbacks((prevFeedbacks) => prevFeedbacks.filter((feedback) => feedback._id !== id));
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      alert("Error deleting feedback. Please try again.");
+    }
+  };
 
   if (loading) {
     return (
@@ -90,17 +115,20 @@ function Feedback() {
 
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="pagination-btn"
+            className="pagination-btn dark:text-white cursor-pointer"
+            
           >
             Previous
           </button>
-          <span>Page {currentPage} of {totalPages}</span>
+          <span className="dark:text-white">
+            Page {currentPage} of {totalPages}
+          </span>
           <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="pagination-btn"
+            className="pagination-btn dark:text-white cursor-pointer"
           >
             Next
           </button>
@@ -121,25 +149,38 @@ function Feedback() {
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {new Date(feedback.createdAt).toLocaleDateString()}
-                    <span className="ml-2 text-gray-400">({feedback.reason})</span>
+                    <span className="ml-2 text-gray-400">
+                      ({feedback.reason})
+                    </span>
                   </p>
                 </div>
-                <div className="flex">
-                  {[...Array(5)].map((_, index) => (
-                    <span
-                      key={index}
-                      className={`text-xl ${
-                        index < feedback.rating
-                          ? "text-yellow-400"
-                          : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    >
-                      ★
-                    </span>
-                  ))}
+                <div className="flex flex-col items-center">
+                  <div className="flex">
+                    {[...Array(5)].map((_, index) => (
+                      <span
+                        key={index}
+                        className={`text-xl ${
+                          index < feedback.rating
+                            ? "text-yellow-400"
+                            : "text-gray-300 dark:text-gray-600"
+                        }`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  {/* Delete Icon Below Rating */}
+                  <button
+                    className="mt-3 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                    onClick={() => handleDelete(feedback._id)}
+                  >
+                    <FaTrash size={18} />
+                  </button>
                 </div>
               </div>
-              <p className="text-gray-700 dark:text-gray-300">{feedback.description}</p>
+              <p className="text-gray-700 dark:text-gray-300">
+                {feedback.description}
+              </p>
             </div>
           ))
         )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -27,10 +28,14 @@ const EventDetailPage = () => {
     termsAccepted: false,
     rulesAccepted: false,
   });
+  const user = useSelector((state) => state.id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Retrieve the current user from Redux (ensure your auth reducer has the user object)
-  const currentUser = useSelector((state) => state.auth.id);
+  const token = useSelector((state) => state.auth.token);
+  const isVerifiedByAdmin = useSelector(
+    (state) => state.auth.isVerifiedByAdmin
+  );
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -72,12 +77,12 @@ const EventDetailPage = () => {
   // Handle registration form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!currentUser) {
       alert("User not authenticated");
       return;
     }
-  
+
     try {
       const response = await fetch(
         `http://localhost:5000/api/user/getevent/register-event/${event._id}/${currentUser}`,
@@ -89,29 +94,46 @@ const EventDetailPage = () => {
           body: JSON.stringify(formData),
         }
       );
-  
+
       // Check if response is JSON
       const textResponse = await response.text();
       console.log("Raw Response:", textResponse);
-  
+
       const data = JSON.parse(textResponse); // Convert to JSON
       console.log("Parsed JSON:", data);
-  
+
       if (response.ok) {
-        alert("Registration successful!");
+        toast.success("Registration successful!", {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
+
         setShowForm(false);
       } else {
-        alert(data.message || "Error occurred during registration");
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
       }
     } catch (error) {
       console.error("Registration error:", error);
       alert("An error occurred during registration. Please try again later.");
     }
   };
-  
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
+      <ToastContainer />
       <div className="max-w-7xl mx-auto">
         <div className="relative h-[300px] rounded-xl overflow-hidden mb-8">
           <img
@@ -333,14 +355,24 @@ const EventDetailPage = () => {
 
               <button
                 onClick={() => setShowForm(true)}
-                disabled={new Date(event.applyLastDate) < new Date()}
+                disabled={
+                  !token ||
+                  !isVerifiedByAdmin ||
+                  new Date(event.applyLastDate) < new Date()
+                }
                 className={`w-full py-3 px-4 rounded-lg font-semibold text-center transition-all duration-300 ${
+                  token &&
+                  isVerifiedByAdmin &&
                   new Date(event.applyLastDate) >= new Date()
                     ? "bg-indigo-600 hover:bg-indigo-700 text-white"
                     : "bg-gray-300 cursor-not-allowed text-gray-500"
                 }`}
               >
-                {new Date(event.applyLastDate) >= new Date()
+                {!token
+                  ? "Login To Register"
+                  : !isVerifiedByAdmin
+                  ? "Your Profile is not Yet Approved!"
+                  : new Date(event.applyLastDate) >= new Date()
                   ? "Register Now"
                   : "Registration Closed"}
               </button>

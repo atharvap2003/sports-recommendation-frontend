@@ -11,7 +11,7 @@ import AchievementPage from "./pages/AchievementsPage";
 import ProfileCreationPage from "./pages/ProfileCreationPage";
 import AdminHome from "./admin/AdminHomePage";
 import FeedbackForm from "./pages/FeedbackForm";
-
+import Chatbot from "./components/Chatbot";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -72,6 +72,8 @@ const AppContent = () => {
       </Routes>
       {/* Only show Footer if not on login or register page */}
       {!hideNavbarFooter && <Footer />}
+
+      <Chatbot />
     </>
   );
 };

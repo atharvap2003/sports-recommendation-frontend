@@ -35,9 +35,11 @@ const EquipmentSection = () => {
                   </div>
                 ))}
               </div>
-              <button className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
-                Request Equipment
-              </button>
+              <a href="/equipment-list">
+                <button className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                  Request Equipment
+                </button>
+              </a>
             </div>
 
             <div className="bg-indigo-900 rounded-xl p-8 text-white">
